@@ -2,6 +2,7 @@ const path = require("path");
 const fs = require("fs");
 const crypto = require("crypto");
 const zlib = require("zlib");
+const { updateRef } = require("../../utils/updateRef");
 
 class CommitTreeCommand {
   constructor(treeSHA, commitSHA, message) {
