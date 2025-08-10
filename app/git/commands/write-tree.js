@@ -41,7 +41,7 @@ class WriteTreeCommand {
   // 1. recursively read all files and directory
   // 2. if item is directory, do it again for inner directory
   // 3. if item is file, create blob, write hash and create file in objects folder and write the entry to tree
-  // 4. write the tree in object folder and output tree sha
+  // 4. write the tree in object folder and output tree commitSHA
   execute() {
     function recursivelyCreateTree(basePath) {
       const dirContents = fs.readdirSync(basePath, { withFileTypes: true });
@@ -54,21 +54,21 @@ class WriteTreeCommand {
         const currentPath = path.join(basePath, name);
         const sts = fs.statSync(currentPath);
         if (sts.isDirectory()) {
-          const sha = recursivelyCreateTree(currentPath);
-          if (sha) {
+          const commitSHA = recursivelyCreateTree(currentPath);
+          if (commitSHA) {
             result.push({
               mode: "40000",
               basename: name,
-              sha,
+              commitSHA,
             });
           }
         } else if (sts.isFile()) {
           const isExecutable = (sts.mode & 0o100) !== 0;
-          const sha = writeFileBlob(currentPath);
+          const commitSHA = writeFileBlob(currentPath);
           result.push({
             mode: isExecutable ? "100755" : "100644",
             basename: name,
-            sha,
+            commitSHA,
           });
         }
       }
@@ -80,11 +80,11 @@ class WriteTreeCommand {
       );
 
       const treeData = result.reduce((acc, curr) => {
-        const { mode, basename, sha } = curr;
+        const { mode, basename, commitSHA } = curr;
         return Buffer.concat([
           acc,
           Buffer.from(`${mode} ${basename}\0`),
-          Buffer.from(sha, "hex"),
+          Buffer.from(commitSHA, "hex"),
         ]);
       }, Buffer.alloc(0));
 
@@ -119,9 +119,9 @@ class WriteTreeCommand {
       return hash;
     }
 
-    const sha = recursivelyCreateTree(process.cwd());
+    const commitSHA = recursivelyCreateTree(process.cwd());
 
-    process.stdout.write(sha + "\n");
+    process.stdout.write(commitSHA + "\n");
   }
 }
 
