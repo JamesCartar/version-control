@@ -10,10 +10,8 @@ class HashObjectCommand {
   }
 
   // Check -w flag included or not
-  // if not
-  //    { read the size of the file, then get the content of the file to construct [ blob <size>\0<content> ] then calculate the hash then output it}
-  // else
-  //    { read the size of the file, then get the content of the file to construct [ blob <size>\0<content> ] then calculate the bash, then write to .git/objects/hash[0,2]/hash[2,] }
+  // if not, read the size of the file, get the content of the file to construct [ blob <size>\0<content> ] then calculate the hash then output it
+  // else read the size of the file, get the content of the file to construct [ blob <size>\0<content> ], calculate the hash, then write to .git/objects/hash[0,2]/hash[2,] }
   execute() {
     const flag = this.flag;
     const filePath = path.resolve(this.filePath);
